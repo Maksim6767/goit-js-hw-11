@@ -2,6 +2,8 @@ import fetchImages from './fetch-images';
 import cardTemplate from '../templates/card-template.hbs';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
+// Для того чтобы подключить CSS код библиотеки SimpleLightbox в проект, 
+// необходимо добавить еще один импорт, кроме того который описан в документации
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import throttle from 'lodash.throttle';
 
@@ -12,9 +14,10 @@ const { searchForm, gallery, loadMoreBtn, endCollectionText } = {
   endCollectionText: document.querySelector('.end-collection-text'),
 };
 
+// Рендер разметки карточек изображений 
 function renderCardImage(arr) {
-  const markup = arr.map(item => cardTemplate(item)).join('');
-  gallery.insertAdjacentHTML('beforeend', markup);
+    const markup = arr.map(item => cardTemplate(item)).join('');
+    gallery.insertAdjacentHTML('beforeend', markup);
 }
 
 let lightbox = new SimpleLightbox('.photo-card a', {
@@ -23,7 +26,7 @@ let lightbox = new SimpleLightbox('.photo-card a', {
   captionDelay: 250,
 });
 
-let currentPage = 1;
+let currentPage = 1;// Изначальное значение параметра page должно быть равным 1
 let currentHits = 0;
 let searchQuery = '';
 
@@ -37,12 +40,11 @@ async function onSubmitSearchForm(e) {
   if (searchQuery === '') {
     return;
   }
-console.log(searchQuery)
-console.log(currentPage)
 
   const response = await fetchImages(searchQuery, currentPage);
-  currentHits = response.hits.length;
-
+  currentHits = response.hits.length; //Подсчет количества обращений
+  if (response.totalHits > 40) {
+//totalHits-общее количество изображений которые подошли под критерий поиска для бесплатного аккаунта
   if (response.totalHits > 40) {
     loadMoreBtn.classList.remove('is-hidden');
   } else {
@@ -53,7 +55,8 @@ console.log(currentPage)
     if (response.totalHits > 0) {
       Notify.success(`Hooray! We found ${response.totalHits} images.`);
       gallery.innerHTML = '';
-      renderCardImage(response.hits);
+        renderCardImage(response.hits);
+    // Уничтожает и повторно инициализирует лайтбокс каждый раз после добавления новой группы карточек изображений
       lightbox.refresh();
       endCollectionText.classList.add('is-hidden');
 
@@ -81,6 +84,7 @@ console.log(currentPage)
 loadMoreBtn.addEventListener('click', onClickLoadMoreBtn);
 
 async function onClickLoadMoreBtn() {
+//Увеличение параметра page на 1 при каждом последующем запросе
   currentPage += 1;
   const response = await fetchImages(searchQuery, currentPage);
   renderCardImage(response.hits);
