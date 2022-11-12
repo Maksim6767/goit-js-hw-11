@@ -33,66 +33,67 @@ let searchQuery = '';
 searchForm.addEventListener('submit', onSubmitSearchForm);
 
 async function onSubmitSearchForm(e) {
-  e.preventDefault();
-  searchQuery = e.currentTarget.searchQuery.value;
-  currentPage = 1;
+    e.preventDefault();
+    searchQuery = e.currentTarget.searchQuery.value;
+    currentPage = 1;
 
-  if (searchQuery === '') {
-    return;
-  }
+    if (searchQuery === '') {
+        return;
+    }
 
-  const response = await fetchImages(searchQuery, currentPage);
-  currentHits = response.hits.length; //Подсчет количества обращений
-  if (response.totalHits > 40) {
-//totalHits-общее количество изображений которые подошли под критерий поиска для бесплатного аккаунта
-  if (response.totalHits > 40) {
-    loadMoreBtn.classList.remove('is-hidden');
-  } else {
-    loadMoreBtn.classList.add('is-hidden');
-  }
+    const response = await fetchImages(searchQuery, currentPage);
+    currentHits = response.hits.length; //Подсчет количества обращений
+    if (response.totalHits > 40) {
+        //totalHits-общее количество изображений которые подошли под критерий поиска для бесплатного аккаунта
+        if (response.totalHits > 40) {
+            loadMoreBtn.classList.remove('is-hidden');
+        } else {
+            loadMoreBtn.classList.add('is-hidden');
+        }
 
-  try {
-    if (response.totalHits > 0) {
-      Notify.success(`Hooray! We found ${response.totalHits} images.`);
-      gallery.innerHTML = '';
+        try {
+            if (response.totalHits > 0) {
+                Notify.success(`Hooray! We found ${response.totalHits} images.`);
+                gallery.innerHTML = '';
+                renderCardImage(response.hits);
+                // Уничтожает и повторно инициализирует лайтбокс каждый раз после добавления новой группы карточек изображений
+                lightbox.refresh();
+                endCollectionText.classList.add('is-hidden');
+
+                const { height: cardHeight } = document
+                    .querySelector('.gallery')
+                    .firstElementChild.getBoundingClientRect();
+
+                window.scrollBy({
+                    top: cardHeight * -100,
+                    behavior: 'smooth',
+                });
+            }
+
+            if (response.totalHits === 0) {
+                gallery.innerHTML = '';
+                Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+                loadMoreBtn.classList.add('is-hidden');
+                endCollectionText.classList.add('is-hidden');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    loadMoreBtn.addEventListener('click', onClickLoadMoreBtn);
+
+    async function onClickLoadMoreBtn() {
+        //Увеличение параметра page на 1 при каждом последующем запросе
+        currentPage += 1;
+        const response = await fetchImages(searchQuery, currentPage);
         renderCardImage(response.hits);
-    // Уничтожает и повторно инициализирует лайтбокс каждый раз после добавления новой группы карточек изображений
-      lightbox.refresh();
-      endCollectionText.classList.add('is-hidden');
+        lightbox.refresh();
+        currentHits += response.hits.length;
 
-      const { height: cardHeight } = document
-        .querySelector('.gallery')
-        .firstElementChild.getBoundingClientRect();
-
-      window.scrollBy({
-        top: cardHeight * -100,
-        behavior: 'smooth',
-      });
+        if (currentHits === response.totalHits) {
+            loadMoreBtn.classList.add('is-hidden');
+            endCollectionText.classList.remove('is-hidden');
+        }
     }
-
-    if (response.totalHits === 0) {
-      gallery.innerHTML = '';
-      Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-      loadMoreBtn.classList.add('is-hidden');
-      endCollectionText.classList.add('is-hidden');
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-loadMoreBtn.addEventListener('click', onClickLoadMoreBtn);
-
-async function onClickLoadMoreBtn() {
-//Увеличение параметра page на 1 при каждом последующем запросе
-  currentPage += 1;
-  const response = await fetchImages(searchQuery, currentPage);
-  renderCardImage(response.hits);
-  lightbox.refresh();
-  currentHits += response.hits.length;
-
-  if (currentHits === response.totalHits) {
-    loadMoreBtn.classList.add('is-hidden');
-    endCollectionText.classList.remove('is-hidden');
-  }
 }
