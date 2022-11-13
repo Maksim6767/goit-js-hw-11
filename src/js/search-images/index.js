@@ -72,7 +72,7 @@ async function onSubmitSearchForm(e) {
                 window.scrollBy({
                     top: cardHeight * 2, // Прокрутка страницы на две высоты карты 
                     behavior: 'smooth',  // Элемент прокручивается плавно;
-                });
+                }); 
             }
 // Если пользователь дошел до конца коллекции, прячем кнопку и выводим уведомление с текстом 
             if (response.totalHits === 0) {
@@ -102,3 +102,10 @@ async function onSubmitSearchForm(e) {
         }
     }
 
+// window.addEventListener('scroll', throttle(onScrollWindow, 500))
+// function onScrollWindow() {
+//      const { scrollHeight, scrollTop, clientHeight } = document.documentElement
+//         if (scrollHeight - clientHeight === scrollTop) {
+//             fetchImages()
+//     }
+// } 
