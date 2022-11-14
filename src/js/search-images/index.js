@@ -7,6 +7,7 @@ import SimpleLightbox from 'simplelightbox'; // Импорт библиотек�
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import throttle from 'lodash.throttle';
 
+
 const { searchForm, gallery, loadMoreBtn, endCollectionText } = {
   searchForm: document.querySelector('.search-form'),
   gallery: document.querySelector('.gallery'),
