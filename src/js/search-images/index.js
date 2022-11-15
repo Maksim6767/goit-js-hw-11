@@ -1,5 +1,5 @@
 import fetchImages from './fetch-images'; // Импорт фукцции запроса данных на бэкенд
-// import cardTemplate from '../templates/card-template.hbs'; // Импорт разметки карточки изображений
+import cardTemplate from '../templates/card-template.hbs'; // Импорт разметки карточки изображений
 import { Notify } from 'notiflix/build/notiflix-notify-aio'; // Импорт библиотеки уведомлений notiflix
 import SimpleLightbox from 'simplelightbox'; // Импорт библиотеки SimpleLightbox для увеличения изображений для галерей 
 // Для того чтобы подключить CSS код библиотеки SimpleLightbox в проект, 
@@ -17,35 +17,10 @@ const { searchForm, gallery, loadMoreBtn, endCollectionText } = {
 
 // Рендер разметки карточек изображений 
 function renderCardImage(arr) {
-    const markup = arr.map(({largeImageURL, webformatURL, tags, likes, views, comments}) => 
-     `
-    <div class='photo-card'>
-    <a href='${largeImageURL}'>
-        <img src='${webformatURL}' alt='${tags}' loading='lazy' />
-    </a>
-    <div class='info'>
-        <p class='info-item'>
-            <b>Likes</b>
-            ${likes}
-        </p>
-        <p class='info-item'>
-            <b>Views</b>
-            ${views}
-        </p>
-        <p class='info-item'>
-            <b>Comments</b>
-            ${comments}
-        </p>
-        <p class='info-item'>
-            <b>Downloads</b>
-            ${downloads}
-        </p>
-    </div>
-</div>`)
+    const markup = arr.map(item => cardTemplate(item))
     .join('');
     gallery.insertAdjacentHTML('beforeend', markup);
 }
-
 // Создаем экземпляр библиотеки со свойствами
 let lightbox = new SimpleLightbox('.photo-card a', {
   captions: true,
